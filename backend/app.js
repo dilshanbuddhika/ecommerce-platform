@@ -20,6 +20,7 @@ import notFound from './middleware/notFound.js';
 
 // Route imports
 import authRoutes from './routes/authRoutes.js';
+import userRoutes from './routes/userRoutes.js';
 
 // Initialize Express
 const app = express();
@@ -112,6 +113,7 @@ app.get('/api/v1/health', (req, res) => {
 
 // API Routes
 app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/users', userRoutes);
 
 // ──────────────────────────────────────────────
 // 7. ERROR HANDLING
