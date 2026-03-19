@@ -1,6 +1,3 @@
-// ============================================
-// EXPRESS APPLICATION SETUP
-// ============================================
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
@@ -9,25 +6,20 @@ import cookieParser from 'cookie-parser';
 import hpp from 'hpp';
 import passport from 'passport';
 
-// Config imports
 import corsOptions from './config/corsOptions.js';
 import configurePassport from './config/passport.js';
 import { generalLimiter } from './middleware/rateLimiter.js';
 
-// Middleware imports
 import errorHandler from './middleware/errorHandler.js';
 import notFound from './middleware/notFound.js';
 
-// Route imports
 import authRoutes from './routes/authRoutes.js';
 import userRoutes from './routes/userRoutes.js';
+import categoryRoutes from './routes/categoryRoutes.js';
+import productRoutes from './routes/productRoutes.js';
 
-// Initialize Express
 const app = express();
 
-// ──────────────────────────────────────────────
-// 1. SECURITY MIDDLEWARE
-// ──────────────────────────────────────────────
 app.use(helmet({
   crossOriginResourcePolicy: { policy: "cross-origin" },
   crossOriginEmbedderPolicy: false,
@@ -35,7 +27,6 @@ app.use(helmet({
 
 app.use(cors(corsOptions));
 
-// Custom NoSQL Injection Protection
 app.use((req, res, next) => {
   const sanitize = (obj) => {
     if (obj && typeof obj === 'object') {
@@ -49,49 +40,29 @@ app.use((req, res, next) => {
     }
     return obj;
   };
-
   if (req.body) sanitize(req.body);
   if (req.params) sanitize(req.params);
-
   next();
 });
 
 app.use(hpp({
-  whitelist: [
-    'price', 'rating', 'category', 'sort', 'fields', 'page', 'limit',
-  ],
+  whitelist: ['price', 'rating', 'category', 'sort', 'fields', 'page', 'limit'],
 }));
 
 app.use('/api', generalLimiter);
 
-// ──────────────────────────────────────────────
-// 2. BODY PARSING MIDDLEWARE
-// ──────────────────────────────────────────────
 app.use(express.json({ limit: '10kb' }));
 app.use(express.urlencoded({ extended: true, limit: '10kb' }));
 app.use(cookieParser());
 
-// ──────────────────────────────────────────────
-// 3. PASSPORT MIDDLEWARE
-// ──────────────────────────────────────────────
 app.use(passport.initialize());
 configurePassport();
 
-// ──────────────────────────────────────────────
-// 4. LOGGING MIDDLEWARE
-// ──────────────────────────────────────────────
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
 
-// ──────────────────────────────────────────────
-// 5. STATIC FILES
-// ──────────────────────────────────────────────
 app.use('/uploads', express.static('uploads'));
-
-// ──────────────────────────────────────────────
-// 6. ROUTES
-// ──────────────────────────────────────────────
 
 app.get('/', (req, res) => {
   res.status(200).json({
@@ -114,10 +85,9 @@ app.get('/api/v1/health', (req, res) => {
 // API Routes
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/users', userRoutes);
+app.use('/api/v1/categories', categoryRoutes);
+app.use('/api/v1/products', productRoutes);
 
-// ──────────────────────────────────────────────
-// 7. ERROR HANDLING
-// ──────────────────────────────────────────────
 app.use(notFound);
 app.use(errorHandler);
 
