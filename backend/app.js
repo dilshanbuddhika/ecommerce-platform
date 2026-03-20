@@ -20,6 +20,7 @@ import productRoutes from './routes/productRoutes.js';
 import cartRoutes from './routes/cartRoutes.js';
 import wishlistRoutes from './routes/wishlistRoutes.js';
 import paymentRoutes from './routes/paymentRoutes.js';
+import orderRoutes from './routes/orderRoutes.js';
 
 const app = express();
 
@@ -93,9 +94,9 @@ app.use('/api/v1/products', productRoutes);
 app.use('/api/v1/cart', cartRoutes);
 app.use('/api/v1/wishlist', wishlistRoutes);
 app.use('/api/v1/payment', paymentRoutes);
+app.use('/api/v1/orders', orderRoutes);
 
 // Future routes
-// app.use('/api/v1/orders', orderRoutes);
 // app.use('/api/v1/reviews', reviewRoutes);
 // app.use('/api/v1/admin', adminRoutes);
 
